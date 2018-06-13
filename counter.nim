@@ -1,24 +1,12 @@
-import os,system,future,strformat,sequtils
 import 
   nimgame2 / [
     nimgame,
-    textgraphic,
-    entity,
     scene,
-    font,
-    truetypefont,
-    types,
-    utils,
-    graphic,
-    procgraphic,
-    draw
+    types
   ],
-  nimgame2/draw as drawmodule
+  userpolygon
 
-import "sdl2/sdl"
-import helpers,frame,userpolygon
-
-
+#[
 proc newRefValDisplay(fnt,smlfnt:Font,refval: ref int):seq[Entity]=
   var top_ent = newEntity()
   var count_ent = newEntity()
@@ -65,7 +53,11 @@ proc newRefValIncreaser(refval:ref int):Entity=
   result = newEntity()
   result.logic=proc(self:Entity,dt:float)=
     refval[]+=1
+]#
+
+
 proc setup*(scene: Scene){.exportc.}=
+  #[ ## Other
   var
     count_val=new(int)
     myfont=newTrueTypeFont()
@@ -80,16 +72,15 @@ proc setup*(scene: Scene){.exportc.}=
   
   scene.add(newRefValDisplay(myfont,smlfont, count_val))
   scene.add(newRefValIncreaser(count_val))
-  var userpoly=newUserPolygonEntity()
-  scene.add(userpoly)
-  userpoly.points.add(( 30.0,   0.0))
-  userpoly.points.add((  0.0,  10.0))
-  userpoly.points.add((  0.0, -10.0))
-  # userpoly.centrify()
-
-  userpoly.pos=nimgame.game.size.Coord/2.0
-  # scene.add(newRefValEcho(count_val))
-
+  ]#
+  var polyEnt=newPolygonEntity()
+  scene.add(polyEnt)
+  polyEnt.points.add(( 30.0,   0.0))
+  polyEnt.points.add((  0.0,  10.0))
+  polyEnt.points.add((  0.0, -10.0))
+  polyEnt.points.add((  -10.0,  10.0))
+  polyEnt.points.add((  -10.0, -10.0))
+  polyEnt.pos=nimgame.game.size.Coord/2.0
   discard
 
 proc destroy*(scene: Scene){.exportc.}=
