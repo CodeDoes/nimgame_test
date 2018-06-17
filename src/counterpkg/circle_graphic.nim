@@ -18,9 +18,11 @@ proc drawCircleGraphic*(self: CircleGraphic,
                       center: Coord = (0.0, 0.0),
                       flip: Flip = Flip.none,
                       region: Rect = Rect(x: 0, y: 0, w: 0, h: 0)) =
-  var point=(pos,angle,scale,center).Transform.point((0.0,0.0))
-  discard circle(point, self.radius, self.fill_color, DrawMode.filled)
-  discard circle(point, self.radius, self.border_color, DrawMode.default)
+  let point =(pos,angle,scale).Transform.point((0.0,0.0))
+  if self.draw_filled:
+    discard circle(point, self.radius, self.fill_color, DrawMode.filled)
+  if self.draw_border:
+    discard circle(point, self.radius, self.border_color, DrawMode.default)
 
 
 
@@ -35,9 +37,8 @@ method draw*(graphic: CircleGraphic,
   drawCircleGraphic(graphic, pos, angle, scale, center, flip, region)
 proc newCircleGraphic*():CircleGraphic=
   new result
+  result.initBorderFillGraphic()
   result.radius = 5.0
-  result.fill_color=ColorPurple ## Traditional visual debugging color
-  result.border_color=ColorPink
 
 method dim*(self:CircleGraphic):Dim=
   return (int self.radius*2,int self.radius*2)

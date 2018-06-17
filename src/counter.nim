@@ -1,1 +1,1 @@
-include counterpkg/counter
+include counterpkg/main

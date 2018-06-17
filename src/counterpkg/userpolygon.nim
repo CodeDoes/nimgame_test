@@ -19,13 +19,14 @@ type
 
 proc initPolygonEntity*(self:PolygonEntity)=
   self.initEntity()
-  self.points= @[]
+  self.points=newSeq[Coord](1024*3)
   # self.animation_frame = 0.0
   # self.animation_points = @[
   #   self.m_points
   # ]
   var polygraphic= newPolygonGraphic()
-  # polygraphic.draw_filled= false
+  polygraphic.draw_filled= false
+  polygraphic.points[]=newSeq[Coord](1024*3)
   self.graphic= polygraphic
   self.physics= defaultPhysics
   self.rotVel= 10.0
@@ -58,9 +59,9 @@ proc initPolygonEntity*(self:PolygonEntity)=
         anim_to[i] * frame_completion
       )
     ]#
-    entity.graphic.PolygonGraphic.points = poly_ent.points
+    entity.graphic.PolygonGraphic.points[] = poly_ent.points
     let 
-      transform:Transform= (self.absPos, self.absRot, self.absScale, self.center)
+      transform:Transform= (self.absPos, self.absRot, self.absScale#[, self.center]#)
       mpos= (mouse.abs.x, mouse.abs.y)
       local_mpos= transform.inverse_point(mpos)
     if MouseButton.left.down:
@@ -90,7 +91,7 @@ proc initPolygonEntity*(self:PolygonEntity)=
         self.points[i]= self.points[i] - local_mpos
         i += 1
       self.center= (0.0, 0.0)
-      self.graphic.PolygonGraphic.points = self.points
+      self.graphic.PolygonGraphic.points[] = self.points
     # if mouseWheel.y != 0:
     self.rotVel += mouseWheel.y * 10.0
   

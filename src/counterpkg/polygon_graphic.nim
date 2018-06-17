@@ -5,16 +5,11 @@ import
   helpers,
   border_fill_graphic
 type
-
   PolygonGraphic* = ref object of BorderFillGraphic
-    points* : seq[Coord]
-    
+    points* : ref seq[Coord]
 
 
-
-
-
-
+var points=newSeq[Coord](0)
 proc drawPolygonGraphic*(self: PolygonGraphic,
                       pos: Coord = (0.0, 0.0),
                       angle: Angle = 0.0,
@@ -22,10 +17,11 @@ proc drawPolygonGraphic*(self: PolygonGraphic,
                       center: Coord = (0.0, 0.0),
                       flip: Flip = Flip.none,
                       region: Rect = Rect(x: 0, y: 0, w: 0, h: 0)) =
-  var transform:Transform = (pos,angle,scale,center)
-  var points: seq[Coord]= @[]
-  for p in self.points:
-    points.add(transform.point(p))
+  var transform:Transform = (pos,angle,scale)
+  let len =self.points[].len
+  points.setLen(len)
+  for i in 0..<len:
+    points[i] = transform.point(self.points[i])
   if self.draw_filled:
     discard polygon(points,self.fill_color,DrawMode.filled)
   if self.draw_border:
@@ -42,15 +38,13 @@ method draw*(graphic: PolygonGraphic,
   drawPolygonGraphic(graphic, pos, angle, scale, center, flip, region)
 
 
-
-
 method dim*(self:PolygonGraphic):Dim=
   var
     x1=0.0
     x2=0.0
     y1=0.0
     y2=0.0
-  for p in self.points:
+  for p in self.points[]:
     x1=min(x1,p.x)
     x2=max(x2,p.x)
     y1=min(y1,p.y)
@@ -60,11 +54,16 @@ method dim*(self:PolygonGraphic):Dim=
     h=y2-y1
   return (w,h)
 
+
 proc initPolygonGraphic*(self:PolygonGraphic)=
   self.initBorderFillGraphic()
-  self.points= @[]
+  new self.points
+  self.points[]= @[]
   self.fill_color= ColorPurple ## Traditional visual debugging color
   self.border_color= ColorPink
+
+
 proc newPolygonGraphic*(): PolygonGraphic=
   new result
   result.initPolygonGraphic()
+
