@@ -2,7 +2,6 @@ import
   nimgame2 / [
     types, graphic, draw, utils
   ],
-  helpers,
   border_fill_graphic
 
 type
@@ -18,7 +17,7 @@ proc drawCircleGraphic*(self: CircleGraphic,
                       center: Coord = (0.0, 0.0),
                       flip: Flip = Flip.none,
                       region: Rect = Rect(x: 0, y: 0, w: 0, h: 0)) =
-  let point =(pos,angle,scale).Transform.point((0.0,0.0))
+  let point:Coord = pos
   if self.draw_filled:
     discard circle(point, self.radius, self.fill_color, DrawMode.filled)
   if self.draw_border:

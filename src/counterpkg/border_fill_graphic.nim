@@ -1,8 +1,7 @@
 import 
   nimgame2 / [
     types, graphic,types
-  ],
-  helpers
+  ]
 type
   BorderFillGraphic* = ref object of Graphic
     border_color*, fill_color*: Color

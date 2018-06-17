@@ -2,37 +2,41 @@ import
   nimgame2 / [
     types,graphic,draw,utils
   ],
-  helpers,
   border_fill_graphic
 
 type
   FrameGraphic* = ref object of BorderFillGraphic
     rect*: Rect
+  Bounds = tuple[a: Coord, b: Coord]
   AngledBounds* = ref object of RootObj
     bounds*: Bounds
     angle*: Angle
     center*: Coord
-proc points*(abounds: AngledBounds,):seq[Coord]=
-  let raw_points = [
-    abounds.bounds.min, 
-    (abounds.bounds.max.x, abounds.bounds.min.y),
-    abounds.bounds.max, 
-    (abounds.bounds.min.x, abounds.bounds.max.y),
-    ] 
-  result = newSeq[Coord](4)
-  for i in 0..<4:
-      result[i]= rotate(raw_points[i],abounds.center,abounds.angle)
-proc points*(self:FrameGraphic,pos:Coord,angle:Angle,scale:Scale,center:Coord):seq[Coord]=
+proc points*(abounds: AngledBounds): auto {.inline.} =
+  let
+    a = abounds.bounds.a
+    b = abounds.bounds.b
+    center = abounds.center
+    angle = abounds.angle
+  template apply(coord: Coord): Coord =
+    rotate(coord, center, angle)
+  return @[
+    apply(a),
+    apply((b.x, a.y)),
+    apply(b), 
+    apply((a.x, b.y))
+  ]
+proc points*(graphic: FrameGraphic, pos: Coord, angle: Angle, scale: Scale, center: Coord):seq[Coord]=
   var 
     abounds = new AngledBounds
-  abounds.bounds= (min: -center*scale, max: (-center+self.dim.toCoord)*scale).Bounds
+  abounds.bounds= (a: -center*scale, b: (-center+graphic.dim.toCoord)*scale).Bounds
   abounds.angle = angle
   abounds.center = pos
   return abounds.points
 
-proc initFrameGraphic(self:FrameGraphic)=
-  self.initBorderFillGraphic()
-  self.rect= Rect(x:0,y:0,w:0,h:0)
+proc initFrameGraphic(graphic:FrameGraphic)=
+  graphic.initBorderFillGraphic()
+  graphic.rect= Rect(x:0,y:0,w:0,h:0)
 proc newFrameGraphic*():FrameGraphic=
   new result
   result.initFrameGraphic()
