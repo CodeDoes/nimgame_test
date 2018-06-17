@@ -6,8 +6,13 @@ import
   ],
   userpolygon
 
+type 
+  MainScene* = ref object of Scene
 
-proc setup*(scene: Scene){.exportc.}=
+
+
+
+proc init*(scene: MainScene)=
   #[ ## Other
   var
     count_val=new(int)
@@ -24,25 +29,23 @@ proc setup*(scene: Scene){.exportc.}=
   scene.add(newRefValDisplay(myfont,smlfont, count_val))
   scene.add(newRefValIncreaser(count_val))
   ]#
+  scene.Scene.init()
   
   var polyEnt=newPolygonEntity()
   scene.add(polyEnt)
-  polyEnt.points.add(( 30.0,   0.0))
-  polyEnt.points.add((  0.0,  10.0))
-  polyEnt.points.add((  0.0, -10.0))
-  polyEnt.points.add((  -10.0,  10.0))
-  polyEnt.points.add((  -10.0, -10.0))
-  polyEnt.pos=nimgame.game.size.Coord/2.0
-  var textEnt=new
-  discard
-
+  polyEnt.points.add(( 10.0,   0.0))
+  polyEnt.points.add((-10.0,   0.0))
+  polyEnt.points.add(( -2.0,  50.0))
+  polyEnt.points.add((  2.0,  50.0))
+  polyEnt.pos = nimgame.game.size.Coord/2.0
+  # var textEnt=new
+proc newMainScene*():MainScene=
+  new result
+  result.init()
 proc destroy*(scene: Scene){.exportc.}=
   discard
 if isMainModule:
   game=newGame()
   if game.init(400,400,"My Game"):
-    var myscene = Scene()
-    myscene.init()
-    game.scene=myscene
-    setup(myscene)
+    game.scene = newMainScene()
     game.run()

@@ -10,49 +10,51 @@ type
 
 
 var points=newSeq[Coord](0)
-proc drawPolygonGraphic*(self: PolygonGraphic,
-                      pos: Coord = (0.0, 0.0),
-                      angle: Angle = 0.0,
-                      scale: Scale = 1.0,
-                      center: Coord = (0.0, 0.0),
-                      flip: Flip = Flip.none,
-                      region: Rect = Rect(x: 0, y: 0, w: 0, h: 0)) =
+proc drawPolygonGraphic*(
+    graphic: PolygonGraphic,
+    pos: Coord = (0.0, 0.0),
+    angle: Angle = 0.0,
+    scale: Scale = 1.0,
+    center: Coord = (0.0, 0.0),
+    flip: Flip = Flip.none,
+    region: Rect = Rect(x: 0, y: 0, w: 0, h: 0))=
   var transform:Transform = (pos,angle,scale)
-  let len =self.points[].len
+  let len =graphic.points[].len
   points.setLen(len)
-  for i in 0..<len:
-    points[i] = transform.point(self.points[i])
-  if self.draw_filled:
-    discard polygon(points,self.fill_color,DrawMode.filled)
-  if self.draw_border:
-    discard polygon(points,self.border_color,DrawMode.default)
+  for i in 0 ..< len:
+    points[i] = transform * graphic.points[i]
+  if graphic.draw_filled:
+    discard polygon(points, graphic.fill_color,DrawMode.filled)
+  if graphic.draw_border:
+    discard polygon(points, graphic.border_color,DrawMode.default)
 
 
-method draw*(graphic: PolygonGraphic,
-             pos: Coord = (0.0, 0.0),
-             angle: Angle = 0.0,
-             scale: Scale = 1.0,
-             center: Coord = (0.0, 0.0),
-             flip: Flip = Flip.none,
-             region: Rect = Rect(x: 0, y: 0, w: 0, h: 0)) =
+method draw*( 
+    graphic: PolygonGraphic,
+    pos: Coord = (0.0, 0.0),
+    angle: Angle = 0.0,
+    scale: Scale = 1.0,
+    center: Coord = (0.0, 0.0),
+    flip: Flip = Flip.none,
+    region: Rect = Rect(x: 0, y: 0, w: 0, h: 0) )=
   drawPolygonGraphic(graphic, pos, angle, scale, center, flip, region)
 
 
-method dim*(self:PolygonGraphic):Dim=
+method dim*(self: PolygonGraphic): Dim =
   var
-    x1=0.0
-    x2=0.0
-    y1=0.0
-    y2=0.0
+    x1 = 0.0
+    x2 = 0.0
+    y1 = 0.0
+    y2 = 0.0
   for p in self.points[]:
-    x1=min(x1,p.x)
-    x2=max(x2,p.x)
-    y1=min(y1,p.y)
-    y2=max(y2,p.y)
+    x1 = min(x1, p.x)
+    x2 = max(x2, p.x)
+    y1 = min(y1, p.y)
+    y2 = max(y2, p.y)
   var
-    w=x2-x1
-    h=y2-y1
-  return (w,h)
+    w = x2 - x1
+    h = y2 - y1
+  return (w, h)
 
 
 proc initPolygonGraphic*(self:PolygonGraphic)=

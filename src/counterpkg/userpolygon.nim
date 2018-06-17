@@ -15,7 +15,12 @@ type
     # animation_points*: seq[seq[Coord]]
     # animation_frame*: float
 
-
+proc `-`(transform: Transform,other: Transform):Transform = 
+  return (
+    pos: transform.pos-other.pos,
+    angle: transform.angle-other.angle,
+    scale: transform.scale-other.scale
+    ).Transform
 
 proc initPolygonEntity*(self:PolygonEntity)=
   self.initEntity()
@@ -29,7 +34,8 @@ proc initPolygonEntity*(self:PolygonEntity)=
   polygraphic.points[]=newSeq[Coord](1024*3)
   self.graphic= polygraphic
   self.physics= defaultPhysics
-  self.rotVel= 10.0
+  self.rotVel= 0.0
+  # self.rot = 90.0
   self.logic= proc(entity: Entity, elapsed: float)=
     var poly_ent = entity.PolygonEntity
     # var hsv = entity.graphic.PolygonGraphic.border_color.toHSV
@@ -61,9 +67,10 @@ proc initPolygonEntity*(self:PolygonEntity)=
     ]#
     entity.graphic.PolygonGraphic.points[] = poly_ent.points
     let 
-      transform:Transform= (self.absPos, self.absRot, self.absScale#[, self.center]#)
+      transform= self.transform#: Transform = (self.absPos, self.absRot, self.absScale)
+      local = transform.local
       mpos= (mouse.abs.x, mouse.abs.y)
-      local_mpos= transform.inverse_point(mpos)
+      local_mpos= local * (mpos - transform.pos)
     if MouseButton.left.down:
       if MouseButton.left.pressed: echo ("1 added point")
       var
@@ -75,10 +82,8 @@ proc initPolygonEntity*(self:PolygonEntity)=
         if closest== -1 or p_dist < dist:
           dist = p_dist
           closest=i
-      if closest== -1:
-        self.points.add(local_mpos)
-      else:
-        self.points.insert(local_mpos,closest+1)
+      if closest== -1: self.points.add(local_mpos)
+      else: self.points.insert(local_mpos,closest+1)
     if MouseButton.right.down:
       if MouseButton.right.down: echo ("2 set pos")
       self.pos= mpos
