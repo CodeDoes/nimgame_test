@@ -35,7 +35,7 @@ proc del*(self: Scene, ent: GameObject)=
     self.del(c)
 # Bounds
 type
-  Bounds* = tuple[min: Coord, max: Coord]
+  Bounds* = tuple[a: Coord, b: Coord]
 
 #[
   # # Transform
@@ -120,17 +120,17 @@ type
 ]#
 proc viewport_bounds*(self:Entity):Bounds=
   var
-    min,max:Coord
+    a,b:Coord
 
-  for c in self.inverse_corners:
-    if min.declared:
-      min=c
-      max=c
+  for c in self.world_corners:
+    if a.declared:
+      a=c
+      b=c
       continue
-    if min.x<c.x: min.x=c.x
-    if min.y<c.y: min.y=c.y
-    if max.x<c.x: max.x=c.x
-    if max.y<c.y: max.y=c.y
+    if a.x<c.x: a.x=c.x
+    if a.y<c.y: a.y=c.y
+    if b.x<c.x: b.x=c.x
+    if b.y<c.y: b.y=c.y
     
     
     
